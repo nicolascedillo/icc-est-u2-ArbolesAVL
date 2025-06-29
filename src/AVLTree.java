@@ -25,57 +25,85 @@ public class AVLTree {
     root = insertRec(root, value);
   }
 
-  private Node insertRec(Node node, int value) {
-    if (node == null) {
+  private Node insertRec(Node nodoActual, int value) {
+    if (nodoActual == null) {
       Node newNode = new Node(value);
       newNode.setHeight(1);
       System.out.println("Nodo insertado: " + newNode.getValue() + " Balance al insertar: " + getBalance(newNode));
       return newNode;
-
     }
 
-    if (value < node.getValue()) {
-      node.setIzquierda(insertRec(node.getIzquierda(), value));
-    } else if (value > node.getValue()) {
-      node.setDerecha(insertRec(node.getDerecha(), value));
+    if (value < nodoActual.getValue()) {
+      nodoActual.setIzquierda(insertRec(nodoActual.getIzquierda(), value));
+    } else if (value > nodoActual.getValue()) {
+      nodoActual.setDerecha(insertRec(nodoActual.getDerecha(), value));
     } else {
-      return node;
+      return nodoActual;
     }
 
-    System.out.println("Node actual: " + node.getValue());
+    int nuevaAltura = 1 + Math.max(height(nodoActual.getIzquierda()), height(nodoActual.getDerecha()));
+    nodoActual.setHeight(nuevaAltura);
 
-    // Actualizar la altura de este ancestro node
-
-    int altura = 1 + Math.max(height(node.getIzquierda()), height(node.getDerecha()));
-
-    node.setHeight(altura);
-    System.out.println("\tAltura = " + node.getHeight());
-
-    int balance = getBalance(node);
-    System.out.println("\tBalance = " + balance);
+    int balance = getBalance(nodoActual);
 
     // Caso Izquierda Izquierda
-    if (balance > 1 && value < node.getIzquierda().getValue()) {
-      System.out.println("Rotacion Derecha");
+    if (balance > 1 && value < nodoActual.getIzquierda().getValue()) {
+      System.out.println("Rotación Derecha (Izquierda-Izquierda)");
+      return rotarDerecha(nodoActual);
     }
 
     // Caso Derecha Derecha
-    if (balance < -1 && value > node.getDerecha().getValue()) {
-      System.out.println("Rotacion Izquierda");
+    if (balance < -1 && value > nodoActual.getDerecha().getValue()) {
+      System.out.println("Rotación Izquierda (Derecha-Derecha)");
+      return rotarIzquierda(nodoActual);
     }
 
     // Caso Izquierda Derecha
-    if (balance > 1 && value > node.getIzquierda().getValue()) {
-      System.out.println("Cambio");
-      System.out.println("Rotacion Derecha");
+    if (balance > 1 && value > nodoActual.getIzquierda().getValue()) {
+      System.out.println("Rotación Izquierda-Derecha");
+      nodoActual.setIzquierda(rotarIzquierda(nodoActual.getIzquierda()));
+      return rotarDerecha(nodoActual);
     }
 
     // Caso Derecha Izquierda
-    if (balance < -1 && value < node.getDerecha().getValue()) {
-      System.out.println("Cambio");
-      System.out.println("Rotacion Izquierda");
+    if (balance < -1 && value < nodoActual.getDerecha().getValue()) {
+      System.out.println("Rotación Derecha-Izquierda");
+      nodoActual.setDerecha(rotarDerecha(nodoActual.getDerecha()));
+      return rotarIzquierda(nodoActual);
     }
 
-    return node;
+    return nodoActual;
+  }
+
+  // Rotación simple a la derecha
+  private Node rotarDerecha(Node nodoDesbalanceado) {
+    Node nodoHijoIzquierdo = nodoDesbalanceado.getIzquierda();
+    Node subarbolDerechoHijoIzquierdo = nodoHijoIzquierdo.getDerecha();
+
+    // Realizar rotación
+    nodoHijoIzquierdo.setDerecha(nodoDesbalanceado);
+    nodoDesbalanceado.setIzquierda(subarbolDerechoHijoIzquierdo);
+
+    // Actualizar alturas
+    nodoDesbalanceado.setHeight(1 + Math.max(height(nodoDesbalanceado.getIzquierda()), height(nodoDesbalanceado.getDerecha())));
+    nodoHijoIzquierdo.setHeight(1 + Math.max(height(nodoHijoIzquierdo.getIzquierda()), height(nodoHijoIzquierdo.getDerecha())));
+
+    return nodoHijoIzquierdo;
+  }
+
+  // Rotación simple a la izquierda
+  private Node rotarIzquierda(Node nodoDesbalanceado) {
+    Node nodoHijoDerecho = nodoDesbalanceado.getDerecha();
+    Node subarbolIzquierdoHijoDerecho = nodoHijoDerecho.getIzquierda();
+
+    // Realizar rotación
+    nodoHijoDerecho.setIzquierda(nodoDesbalanceado);
+    nodoDesbalanceado.setDerecha(subarbolIzquierdoHijoDerecho);
+
+    // Actualizar alturas
+    nodoDesbalanceado.setHeight(1 + Math.max(height(nodoDesbalanceado.getIzquierda()), height(nodoDesbalanceado.getDerecha())));
+    nodoHijoDerecho.setHeight(1 + Math.max(height(nodoHijoDerecho.getIzquierda()), height(nodoHijoDerecho.getDerecha())));
+
+    return nodoHijoDerecho;
   }
 }

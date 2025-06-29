@@ -1,6 +1,5 @@
 public class App {
     public static void main(String[] args) throws Exception {
-
         System.out.println("Nombres: Nicolas Cedillo - Mateo Miller");
 
         AVLTree aT = new AVLTree();
@@ -8,6 +7,5 @@ public class App {
         aT.insert(10);
         aT.insert(20);
         aT.insert(15);
-
     }
 }
