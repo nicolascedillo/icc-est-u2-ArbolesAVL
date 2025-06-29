@@ -1,6 +1,10 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class AVLTree {
 
   private Node root;
+  private List<Integer> ordenDeInsercion = new ArrayList<>();
 
   public AVLTree() {
     this.root = null;
@@ -21,94 +25,118 @@ public class AVLTree {
   }
 
   public void insert(int value) {
-    System.out.println("Valor a insertar: " + value);
+    System.out.println("Insertando valor: " + value);
+    ordenDeInsercion.add(value);
     root = insertRec(root, value);
+    System.out.println("Inserción completa de: " + value + "\n");
   }
 
-  private Node insertRec(Node node, int value) {
-    if (node == null) {
+  private Node insertRec(Node nodoActual, int value) {
+    if (nodoActual == null) {
       Node newNode = new Node(value);
       newNode.setHeight(1);
-      System.out.println("Nodo insertado: " + newNode.getValue() + " Balance al insertar: " + getBalance(newNode));
+      System.out.println("Nodo creado con valor: " + newNode.getValue());
       return newNode;
-
     }
 
-    if (value < node.getValue()) {
-      node.setIzquierda(insertRec(node.getIzquierda(), value));
-    } else if (value > node.getValue()) {
-      node.setDerecha(insertRec(node.getDerecha(), value));
+    if (value < nodoActual.getValue()) {
+      System.out.println("Ir a la izquierda de " + nodoActual.getValue());
+      nodoActual.setIzquierda(insertRec(nodoActual.getIzquierda(), value));
+    } else if (value > nodoActual.getValue()) {
+      System.out.println("Ir a la derecha de " + nodoActual.getValue());
+      nodoActual.setDerecha(insertRec(nodoActual.getDerecha(), value));
     } else {
-      return node;
+      System.out.println("Valor duplicado no insertado: " + value);
+      return nodoActual;
     }
 
-    System.out.println("Node actual: " + node.getValue());
+    int nuevaAltura = 1 + Math.max(height(nodoActual.getIzquierda()), height(nodoActual.getDerecha()));
+    nodoActual.setHeight(nuevaAltura);
+    System.out.println("Altura actualizada de " + nodoActual.getValue() + ": " + nuevaAltura);
 
-    // Actualizar la altura de este ancestro node
-
-    int altura = 1 + Math.max(height(node.getIzquierda()), height(node.getDerecha()));
-
-    node.setHeight(altura);
-    System.out.println("\tAltura = " + node.getHeight());
-
-    int balance = getBalance(node);
-    System.out.println("\tBalance = " + balance);
+    int balance = getBalance(nodoActual);
+    System.out.println("Balance de " + nodoActual.getValue() + ": " + balance);
 
     // Caso Izquierda Izquierda
-    if (balance > 1 && value < node.getIzquierda().getValue()) {
-      System.out.println("Rotacion Derecha");
-      return rotateRight(node);
+    if (balance > 1 && value < nodoActual.getIzquierda().getValue()) {
+      System.out.println("Rotación Derecha (Izquierda-Izquierda) en " + nodoActual.getValue());
+      return rotarDerecha(nodoActual);
     }
 
     // Caso Derecha Derecha
-    if (balance < -1 && value > node.getDerecha().getValue()) {
-      System.out.println("Rotacion Izquierda");
-      return rotateLeft(node);
+    if (balance < -1 && value > nodoActual.getDerecha().getValue()) {
+      System.out.println("Rotación Izquierda (Derecha-Derecha) en " + nodoActual.getValue());
+      return rotarIzquierda(nodoActual);
     }
 
     // Caso Izquierda Derecha
-    if (balance > 1 && value > node.getIzquierda().getValue()) {
-      System.out.println("Cambio");
-      System.out.println("Rotacion Derecha");
-      node.setIzquierda(rotateLeft(node.getIzquierda()));
-      return rotateRight(node);
+    if (balance > 1 && value > nodoActual.getIzquierda().getValue()) {
+      System.out.println("Rotación Izquierda-Derecha en " + nodoActual.getValue());
+      nodoActual.setIzquierda(rotarIzquierda(nodoActual.getIzquierda()));
+      return rotarDerecha(nodoActual);
     }
 
     // Caso Derecha Izquierda
-    if (balance < -1 && value < node.getDerecha().getValue()) {
-      System.out.println("Cambio");
-      System.out.println("Rotacion Izquierda");
-      node.setDerecha(rotateRight(node.getDerecha()));
-      return rotateLeft(node);
+    if (balance < -1 && value < nodoActual.getDerecha().getValue()) {
+      System.out.println("Rotación Derecha-Izquierda en " + nodoActual.getValue());
+      nodoActual.setDerecha(rotarDerecha(nodoActual.getDerecha()));
+      return rotarIzquierda(nodoActual);
     }
 
-    return node;
+    return nodoActual;
   }
 
-private Node rotateRight(Node y) {
-    Node x = y.getIzquierda();
-    Node T2 = x.getDerecha();
+  private Node rotarDerecha(Node nodoDesbalanceado) {
+    System.out.println("Ejecutando rotación derecha en " + nodoDesbalanceado.getValue());
 
-    x.setDerecha(y);
-    y.setIzquierda(T2);
+    Node nodoHijoIzquierdo = nodoDesbalanceado.getIzquierda();
+    Node subarbolDerechoHijoIzquierdo = nodoHijoIzquierdo.getDerecha();
 
-    y.setHeight(1 + Math.max(height(y.getIzquierda()), height(y.getDerecha())));
-    x.setHeight(1 + Math.max(height(x.getIzquierda()), height(x.getDerecha())));
+    nodoHijoIzquierdo.setDerecha(nodoDesbalanceado);
+    nodoDesbalanceado.setIzquierda(subarbolDerechoHijoIzquierdo);
 
-    return x;
-}
+    nodoDesbalanceado.setHeight(1 + Math.max(height(nodoDesbalanceado.getIzquierda()), height(nodoDesbalanceado.getDerecha())));
+    nodoHijoIzquierdo.setHeight(1 + Math.max(height(nodoHijoIzquierdo.getIzquierda()), height(nodoHijoIzquierdo.getDerecha())));
 
-private Node rotateLeft(Node x) {
-    Node y = x.getDerecha();
-    Node T2 = y.getIzquierda();
+    System.out.println("Rotación derecha completada. Nueva raíz del subárbol: " + nodoHijoIzquierdo.getValue());
+    return nodoHijoIzquierdo;
+  }
 
-    y.setIzquierda(x);
-    x.setDerecha(T2);
+  private Node rotarIzquierda(Node nodoDesbalanceado) {
+    System.out.println("Ejecutando rotación izquierda en " + nodoDesbalanceado.getValue());
 
-    x.setHeight(1 + Math.max(height(x.getIzquierda()), height(x.getDerecha())));
-    y.setHeight(1 + Math.max(height(y.getIzquierda()), height(y.getDerecha())));
+    Node nodoHijoDerecho = nodoDesbalanceado.getDerecha();
+    Node subarbolIzquierdoHijoDerecho = nodoHijoDerecho.getIzquierda();
 
-    return y;
-}
+    nodoHijoDerecho.setIzquierda(nodoDesbalanceado);
+    nodoDesbalanceado.setDerecha(subarbolIzquierdoHijoDerecho);
 
+    nodoDesbalanceado.setHeight(1 + Math.max(height(nodoDesbalanceado.getIzquierda()), height(nodoDesbalanceado.getDerecha())));
+    nodoHijoDerecho.setHeight(1 + Math.max(height(nodoHijoDerecho.getIzquierda()), height(nodoHijoDerecho.getDerecha())));
+
+    System.out.println("Rotación izquierda completada. Nueva raíz del subárbol: " + nodoHijoDerecho.getValue());
+    return nodoHijoDerecho;
+  }
+
+  public void inOrder() {
+    System.out.println("Recorrido inorden del árbol:");
+    inOrderRec(root);
+    System.out.println();
+  }
+
+  private void inOrderRec(Node nodo) {
+    if (nodo != null) {
+      inOrderRec(nodo.getIzquierda());
+      System.out.print(nodo.getValue() + " ");
+      inOrderRec(nodo.getDerecha());
+    }
+  }
+
+  public void input() {
+    System.out.println("Valores en orden de entrada:");
+    for (int valor : ordenDeInsercion) {
+      System.out.print(valor + " ");
+    }
+    System.out.println();
+  }
 }

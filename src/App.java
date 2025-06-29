@@ -9,5 +9,8 @@ public class App {
         aT.insert(20);
         aT.insert(15);
 
+        aT.input();
+        aT.inOrder();
+
     }
 }
