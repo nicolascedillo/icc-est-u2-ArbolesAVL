@@ -15,7 +15,7 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 ## Imagen
 
-![Resultado](./imagen.png)
+![image](https://github.com/user-attachments/assets/3d18babb-fe32-41ed-9cdd-64b76a68c108)
 
 ## Dependency Management
 
