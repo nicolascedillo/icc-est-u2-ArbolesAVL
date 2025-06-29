@@ -10,5 +10,6 @@ public class App {
 
         aT.input();
         aT.inOrder();
+        
     }
 }
