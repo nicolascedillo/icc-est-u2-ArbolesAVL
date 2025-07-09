@@ -3,6 +3,7 @@ public class App {
 
         System.out.println("Nombres: Nicolas Cedillo - Mateo Miller");
 
+        
         AVLTree aT = new AVLTree();
 
         aT.insert(10);
